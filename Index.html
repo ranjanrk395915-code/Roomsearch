@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Search - Rent पर कमरा खोजें</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  body { background: #f4f7fb; color: #222; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white; padding: 20px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  header h1 { font-size: 26px; }
+  header h1 span { color: #fbbf24; }
+  nav a { color: white; text-decoration: none; margin-left: 25px; font-weight: 500; }
+  nav a:hover { color: #fbbf24; }
+
+  /* Hero / Search */
+  .hero {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white; padding: 60px 20px 90px; text-align: center;
+  }
+  .hero h2 { font-size: 40px; margin-bottom: 12px; }
+  .hero p { font-size: 18px; opacity: 0.9; margin-bottom: 30px; }
+
+  .search-box {
+    background: white; max-width: 900px; margin: -50px auto 0;
+    padding: 25px; border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;
+  }
+  .search-box input, .search-box select {
+    padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+    font-size: 15px; outline: none;
+  }
+  .search-box input:focus, .search-box select:focus { border-color: #2563eb; }
+  .search-box button {
+    background: #2563eb; color: white; border: none; padding: 12px;
+    border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 600;
+  }
+  .search-box button:hover { background: #1d4ed8; }
+
+  /* Rooms grid */
+  .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+  .section-title { font-size: 26px; margin-bottom: 25px; color: #1e293b; }
+
+  .rooms-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+  }
+
+  .room-card {
+    background: white; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: 0.3s;
+    cursor: pointer;
+  }
+  .room-card:hover { transform: translateY(-6px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+
+  .room-card img { width: 100%; height: 200px; object-fit: cover; }
+  .room-info { padding: 18px; }
+  .room-info h3 { font-size: 19px; margin-bottom: 6px; }
+  .room-info .loc { color: #64748b; font-size: 14px; margin-bottom: 10px; }
+  .room-info .price {
+    font-size: 22px; font-weight: 700; color: #2563eb; margin-bottom: 10px;
+  }
+  .room-info .price span { font-size: 14px; color: #64748b; font-weight: 400; }
+
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .tag {
+    background: #e0e7ff; color: #3730a3; padding: 4px 10px;
+    border-radius: 20px; font-size: 12px; font-weight: 500;
+  }
+  .tag.furnished { background: #dcfce7; color: #166534; }
+
+  .btn {
+    display: block; width: 100%; padding: 10px; background: #2563eb;
+    color: white; border: none; border-radius: 8px; font-size: 15px;
+    cursor: pointer; font-weight: 600; text-align: center; text-decoration: none;
+  }
+  .btn:hover { background: #1d4ed8; }
+
+  .no-result {
+    text-align: center; padding: 40px; color: #64748b; font-size: 18px;
+    grid-column: 1/-1;
+  }
+
+  /* Footer */
+  footer {
+    background: #1e293b; color: #cbd5e1; text-align: center;
+    padding: 30px 20px; margin-top: 60px; font-size: 14px;
+  }
+  footer a { color: #fbbf24; text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .search-box { grid-template-columns: 1fr; }
+    .hero h2 { font-size: 28px; }
+    header { flex-direction: column; gap: 10px; padding: 15px; }
+    nav a { margin: 0 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏠 Room<span>Search</span></h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#rooms">Rooms</a>
+    <a href="#">Post Room</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>अपना सपनों का कमरा खोजें</h2>
+  <p>किराये पर बेहतरीन कमरे, आसानी से</p>
+</section>
+
+<div class="search-box">
+  <input type="text" id="searchLocation" placeholder="📍 Location (जैसे: Delhi, Mumbai)">
+  <select id="searchType">
+    <option value="">Room Type</option>
+    <option value="1BHK">1 BHK</option>
+    <option value="2BHK">2 BHK</option>
+    <option value="Single Room">Single Room</option>
+  </select>
+  <input type="number" id="searchPrice" placeholder="💰 Max Price (₹)">
+  <button onclick="filterRooms()">🔍 Search</button>
+</div>
+
+<div class="container">
+  <h2 class="section-title" id="rooms">Available Rooms</h2>
+  <div class="rooms-grid" id="roomsGrid"></div>
+</div>
+
+<footer>
+  <p>© 2025 RoomSearch · Made with ❤️ · <a href="#">Contact Us</a></p>
+</footer>
+
+<script>
+// Room data (demo) - आप इसे backend से ला सकते हैं
+const rooms = [
+  { id:1, title:"Furnished 1BHK Flat", location:"Delhi", type:"1BHK", price:12000, furnished:true, img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500" },
+  { id:2, title:"Single Room for Students", location:"Mumbai", type:"Single Room", price:6000, furnished:false, img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500" },
+  { id:3, title:"Spacious 2BHK Apartment", location:"Bangalore", type:"2BHK", price:25000, furnished:true, img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500" },
+  { id:4, title:"Cozy Single Room", location:"Delhi", type:"Single Room", price:5500, furnished:false, img:"https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=500" },
+  { id:5, title:"Modern 1BHK Studio", location:"Pune", type:"1BHK", price:15000, furnished:true, img:"https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=500" },
+  { id:6, title:"Family 2BHK Flat", location:"Hyderabad", type:"2BHK", price:18000, furnished:false, img:"https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=500" }
+];
+
+function displayRooms(list) {
+  const grid = document.getElementById('roomsGrid');
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="no-result">😔 कोई कमरा नहीं मिला। Filter बदलकर देखें।</div>';
+    return;
+  }
+  grid.innerHTML = list.map(r => `
+    <div class="room-card">
+      <img src="${r.img}" alt="${r.title}">
+      <div class="room-info">
+        <h3>${r.title}</h3>
+        <div class="loc">📍 ${r.location}</div>
+        <div class="price">₹${r.price.toLocaleString()} <span>/month</span></div>
+        <div class="tags">
+          <span class="tag">${r.type}</span>
+          ${r.furnished ? '<span class="tag furnished">Furnished</span>' : ''}
+        </div>
+        <a href="#" class="btn">📞 Contact Owner</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterRooms() {
+  const loc = document.getElementById('searchLocation').value.trim().toLowerCase();
+  const type = document.getElementById('searchType').value;
+  const price = parseInt(document.getElementById('searchPrice').value);
+
+  const filtered = rooms.filter(r => {
+    const okLoc = !loc || r.location.toLowerCase().includes(loc);
+    const okType = !type || r.type === type;
+    const okPrice = !price || r.price <= price;
+    return okLoc && okType && okPrice;
+  });
+
+  displayRooms(filtered);
+  document.getElementById('rooms').scrollIntoView({ behavior:'smooth' });
+}
+
+// Initial load
+displayRooms(rooms);
+</script>
+
+</body>
+</html>
